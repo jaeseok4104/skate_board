@@ -8,9 +8,9 @@
 #define HALLA PINE.5
 #define HALLB PINE.6
 #define HALLC PINE.7
-#define Kp 15
+#define Kp 7
 #define Ki 1.0   
-#define Kd 0.5
+#define Kd 0
 
 //ENCODER
 int hall_sensor_value = 0;
@@ -18,7 +18,7 @@ int hall_sensor_value = 0;
 //USART
 unsigned char RXC_BUFF[20] = {0x0a,};
 unsigned char RXC_index = 0;
-unsigned char SET_RXC1 = 0;
+unsigned char SET_RXC1 = 0;                        
 unsigned char recByte = 0;
 unsigned char BUFF = 0;  
 
@@ -129,7 +129,6 @@ int PID_Controller(int Goal, int now, float* integral, float* Err_previous)
     Err = Goal - now; //ERROR
     pErr = (Kp*Err); // P
     *integral = *integral +(Ki * Err * Time); // I
-    //if(*Err == 0) *integral = 0; //적분 누적 방지법
     dErr = (Kd * (Err - *Err_previous)) / Time; // D
 
     MV = (int)(pErr+ *integral + dErr);// PID Control Volume
@@ -237,7 +236,7 @@ void main(void)
 
         now = (int)(6*hall_sensor_value);
         OCR_val = PID_Controller(Goal, now, &integral, &Err);
-        OCR_SET = MV_Rebuilding(-150, 150, OCR_val);
+        OCR_SET = MV_Rebuilding(-270, 270, OCR_val);
         producePWM(OCR_val, OCR_SET);
     
         

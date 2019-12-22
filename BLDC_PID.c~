@@ -8,9 +8,9 @@
 #define HALLA PINE.5
 #define HALLB PINE.6
 #define HALLC PINE.7
-#define Kp 9
-#define Ki 0.037   
-#define Kd 0.01
+#define Kp 15
+#define Ki 1.0   
+#define Kd 0.5
 
 //ENCODER
 int hall_sensor_value = 0;
@@ -18,9 +18,9 @@ int hall_sensor_value = 0;
 //USART
 unsigned char RXC_BUFF[20] = {0x0a,};
 unsigned char RXC_index = 0;
-unsigned char SET_RXC1 = 0;
+unsigned char SET_RXC1 = 0;                        
 unsigned char recByte = 0;
-unsigned char BUFF = 0;
+unsigned char BUFF = 0;  
 
 //PID
 char tick = 0;
@@ -127,7 +127,6 @@ int PID_Controller(int Goal, int now, float* integral, float* Err_previous)
     float Err = 0;
 
     Err = Goal - now; //ERROR
-
     pErr = (Kp*Err); // P
     *integral = *integral +(Ki * Err * Time); // I
     dErr = (Kd * (Err - *Err_previous)) / Time; // D
@@ -239,11 +238,11 @@ void main(void)
         OCR_val = PID_Controller(Goal, now, &integral, &Err);
         OCR_SET = MV_Rebuilding(-150, 150, OCR_val);
         producePWM(OCR_val, OCR_SET);
+    
         
         tick += TCNT2;
         TCNT2 = 0;
-        Time = 0.000069*tick;
-        
+        Time = 0.000069*tick;    
         sprintf(BUFF, "Goal=%d, current=%d, Err=%d \r\n", Goal, now, (int)Err);
         string_tx1(BUFF);
         
