@@ -1,0 +1,20 @@
+RAM Allocation
+Variable                                                          Address   Size
+--------------------------------------------------------------------------------
+RXC_BUFF                                                          0x0500      20
+Time                                                              0x0514       4
+_seed                                                             0x0518       4
+
+EEPROM Allocation
+Variable                                                          Address   Size
+--------------------------------------------------------------------------------
+
+Register Allocation
+Variable                                                          Register  Size
+--------------------------------------------------------------------------------
+hall_sensor_value                                                 R4,R5        2
+RXC_index                                                         R7           1
+SET_RXC1                                                          R6           1
+recByte                                                           R9           1
+BUFF                                                              R8           1
+tick                                                              R11          1
