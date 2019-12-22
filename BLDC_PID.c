@@ -8,8 +8,8 @@
 #define HALLA PINE.5
 #define HALLB PINE.6
 #define HALLC PINE.7
-#define Kp 7
-#define Ki 1.0   
+#define Kp 4
+#define Ki 0   
 #define Kd 0
 
 //ENCODER
@@ -236,7 +236,7 @@ void main(void)
 
         now = (int)(6*hall_sensor_value);
         OCR_val = PID_Controller(Goal, now, &integral, &Err);
-        OCR_SET = MV_Rebuilding(-270, 270, OCR_val);
+        OCR_SET = MV_Rebuilding(-150, 150, OCR_val);
         producePWM(OCR_val, OCR_SET);
     
         
