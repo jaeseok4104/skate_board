@@ -8,9 +8,9 @@
 #define HALLA PINE.5
 #define HALLB PINE.6
 #define HALLC PINE.7
-#define Kp 5
+#define Kp 3
 #define Ki 0   
-#define Kd 0
+#define Kd 0.01
 
 //ENCODER
 int hall_sensor_value = 0;
