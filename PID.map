@@ -13,8 +13,8 @@ Variable                                                          Address   Size
 Register Allocation
 Variable                                                          Register  Size
 --------------------------------------------------------------------------------
-RXC_index                                                         R5           1
-SET_RXC1                                                          R4           1
-recByte                                                           R7           1
-BUFF                                                              R6           1
-tick                                                              R9           1
+RXC_index                                                         R7           1
+SET_RXC1                                                          R6           1
+recByte                                                           R9           1
+BUFF                                                              R8           1
+tick                                                              R11          1

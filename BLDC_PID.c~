@@ -8,8 +8,9 @@
 #define HALLA PINE.5
 #define HALLB PINE.6
 #define HALLC PINE.7
-#define Kp 5
-#define Ki 0.2   
+#define Kp 100
+//#define Ki 0.2   
+#define Ki 0
 #define Kd 0
 
 //ENCODER
@@ -100,7 +101,7 @@ void TIMER_init(void)
     OCR1B = 0x00;
     OCR1CH = 0x00;
     OCR1CL = 0x00;
-    ICR1 = 600; //664
+    ICR1 = 600;//1200; //664
     
     TIMSK = (1<<TOIE2);
 }
@@ -241,14 +242,14 @@ void main(void)
 
         now = (7.5*hall_sensor_value);
         OCR_val = PID_Controller(Goal, now, &integral, &Err);
-        OCR_SET = MV_Rebuilding(-300, 300, OCR_val);
+        OCR_SET = MV_Rebuilding(-(ICR1*0.45), (ICR1*0.45), OCR_val);
         producePWM(OCR_val, OCR_SET);
     
         
         tick += TCNT2;
         TCNT2 = 0;
         Time = 0.000069*tick;    
-        sprintf(BUFF, "Goal=%d, current=%d, Err=%d \r\n", Goal, now, (int)Err);
+        sprintf(BUFF, "Goal=%d,%d,%d,%d,%d \r\n", Goal, (int)now, (int)Err, OCR_val,OCR_SET*((MOTOR1_DIRECTION)?-1:1));
         string_tx1(BUFF);
         
         tick = 0;
