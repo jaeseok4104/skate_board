@@ -8,12 +8,12 @@
 #define HALLA PINE.5
 #define HALLB PINE.6
 #define HALLC PINE.7
-#define Kp 3
-#define Ki 0   
-#define Kd 0.01
+#define Kp 5
+#define Ki 0.2   
+#define Kd 0
 
 //ENCODER
-int hall_sensor_value = 0;
+long int hall_sensor_value = 0;
 
 //USART
 unsigned char RXC_BUFF[20] = {0x0a,};
@@ -100,7 +100,7 @@ void TIMER_init(void)
     OCR1B = 0x00;
     OCR1CH = 0x00;
     OCR1CL = 0x00;
-    ICR1 = 300; //664
+    ICR1 = 1200; //664
     
     TIMSK = (1<<TOIE2);
 }
@@ -119,19 +119,24 @@ unsigned int MV_Rebuilding(int first, int last, int MV)
 }
 
 
-int PID_Controller(int Goal, int now, float* integral, float* Err_previous)
+int PID_Controller(int Goal, float now, float* integral, float* Err_previous)
 {
     float pErr = 0;
     float dErr = 0;
     int MV = 0;
     float Err = 0;
+    unsigned char BUFF[128]={0,};
 
     Err = Goal - now; //ERROR
+
     pErr = (Kp*Err); // P
     *integral = *integral +(Ki * Err * Time); // I
     dErr = (Kd * (Err - *Err_previous)) / Time; // D
-
     MV = (int)(pErr+ *integral + dErr);// PID Control Volume
+
+    //sprintf(BUFF, "pErr=%d, integral=%d, dErr=%d, MV=%d  Err=%d\r\n", (int)pErr, *integral, dErr, MV, (int)Err);
+    //string_tx1(BUFF);
+
     *Err_previous = Err;
     
     return MV;
@@ -206,7 +211,7 @@ void main(void)
     int Goal = 0;
     float Err = 0;
     float integral = 0;
-    int now = 0;
+    float now = 0;
 
     unsigned int current_time = 0;
     char BUFF[128]={0,};
@@ -234,16 +239,16 @@ void main(void)
             RXC_BUFF[i] = 0;
         }
 
-        now = (int)(6*hall_sensor_value);
+        now = (7.5*hall_sensor_value);
         OCR_val = PID_Controller(Goal, now, &integral, &Err);
-        OCR_SET = MV_Rebuilding(-170, 170, OCR_val);
+        OCR_SET = MV_Rebuilding(-600, 600, OCR_val);
         producePWM(OCR_val, OCR_SET);
     
         
         tick += TCNT2;
         TCNT2 = 0;
         Time = 0.000069*tick;    
-        sprintf(BUFF, "Goal=%d, current=%d, Err=%d \r\n", Goal, now, (int)Err);
+        sprintf(BUFF, "Goal=%d, current=%d, Err=%d \r\n", Goal, (int)now, (int)Err);
         string_tx1(BUFF);
         
         tick = 0;

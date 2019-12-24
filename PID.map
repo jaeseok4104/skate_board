@@ -1,9 +1,10 @@
 RAM Allocation
 Variable                                                          Address   Size
 --------------------------------------------------------------------------------
-RXC_BUFF                                                          0x0500      20
-Time                                                              0x0514       4
-_seed                                                             0x0518       4
+hall_sensor_value                                                 0x0500       4
+RXC_BUFF                                                          0x0504      20
+Time                                                              0x0518       4
+_seed                                                             0x051C       4
 
 EEPROM Allocation
 Variable                                                          Address   Size
@@ -12,9 +13,8 @@ Variable                                                          Address   Size
 Register Allocation
 Variable                                                          Register  Size
 --------------------------------------------------------------------------------
-hall_sensor_value                                                 R4,R5        2
-RXC_index                                                         R7           1
-SET_RXC1                                                          R6           1
-recByte                                                           R9           1
-BUFF                                                              R8           1
-tick                                                              R11          1
+RXC_index                                                         R5           1
+SET_RXC1                                                          R4           1
+recByte                                                           R7           1
+BUFF                                                              R6           1
+tick                                                              R9           1
