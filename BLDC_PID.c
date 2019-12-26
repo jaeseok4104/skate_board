@@ -12,6 +12,7 @@
 //#define Ki 0.2   
 #define Ki 0
 #define Kd 0
+#define Duty 0.45
 
 //ENCODER
 long int hall_sensor_value = 0;
@@ -101,12 +102,12 @@ void TIMER_init(void)
     OCR1B = 0x00;
     OCR1CH = 0x00;
     OCR1CL = 0x00;
-    ICR1 = 600;//1200; //664
+    ICR1 = 1200;//1200; //664
     
     TIMSK = (1<<TOIE2);
 }
 
-unsigned int MV_Rebuilding(int first, int last, int MV)
+unsigned int MV_Rebuilding(int first, int last, long int MV)
 {
     unsigned int reMV;
     
@@ -120,11 +121,11 @@ unsigned int MV_Rebuilding(int first, int last, int MV)
 }
 
 
-int PID_Controller(int Goal, float now, float* integral, float* Err_previous)
+long int PID_Controller(int Goal, float now, float* integral, float* Err_previous)
 {
-    float pErr = 0;
+    long int pErr = 0;
     float dErr = 0;
-    int MV = 0;
+    long int MV = 0;
     float Err = 0;
     unsigned char BUFF[128]={0,};
 
@@ -133,7 +134,7 @@ int PID_Controller(int Goal, float now, float* integral, float* Err_previous)
     pErr = (Kp*Err); // P
     *integral = *integral +(Ki * Err * Time); // I
     dErr = (Kd * (Err - *Err_previous)) / Time; // D
-    MV = (int)(pErr+ *integral + dErr);// PID Control Volume
+    MV = (long int)(pErr+ *integral + dErr);// PID Control Volume
 
     //sprintf(BUFF, "pErr=%d, integral=%d, dErr=%d, MV=%d  Err=%d\r\n", (int)pErr, *integral, dErr, MV, (int)Err);
     //string_tx1(BUFF);
@@ -143,7 +144,7 @@ int PID_Controller(int Goal, float now, float* integral, float* Err_previous)
     return MV;
 }
 
-void producePWM(int OCR_val, unsigned int OCR_SET)
+void producePWM(long int OCR_val, unsigned int OCR_SET)
 {
     if(OCR_val < 0)
     {
@@ -218,7 +219,7 @@ void main(void)
     char BUFF[128]={0,};
     
     //Controll Volume
-    int OCR_val = 0;
+    long int OCR_val = 0;
     unsigned int OCR_SET = 0;
 
     USART1_init();
@@ -242,10 +243,9 @@ void main(void)
 
         now = (7.5*hall_sensor_value);
         OCR_val = PID_Controller(Goal, now, &integral, &Err);
-        OCR_SET = MV_Rebuilding(-(ICR1*0.45), (ICR1*0.45), OCR_val);
+        OCR_SET = MV_Rebuilding(-(ICR1*Duty), (ICR1*Duty), OCR_val);
         producePWM(OCR_val, OCR_SET);
     
-        
         tick += TCNT2;
         TCNT2 = 0;
         Time = 0.000069*tick;    
