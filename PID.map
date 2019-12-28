@@ -17,4 +17,4 @@ RXC_index                                                         R7           1
 SET_RXC1                                                          R6           1
 recByte                                                           R9           1
 BUFF                                                              R8           1
-tick                                                              R11          1
+update                                                            R11          1
