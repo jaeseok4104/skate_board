@@ -11,7 +11,8 @@
 #define Kp 10
 #define Ki 0
 #define Kd 0
-#define Duty 0.95
+#define lessDuty 0.95
+#define topDuty 0.52
 
 //ENCODER
 long int hall_sensor_value = 0;
@@ -102,22 +103,28 @@ void TIMER_init(void)
     OCR1B = 0x00;
     OCR1CH = 0x00;
     OCR1CL = 0x00;
-    ICR1 = 1200;//1200; //664
+    ICR1 = 800;//1200; //664
     
     TIMSK = (1<<OCIE2);
 }
 
-unsigned int MV_Rebuilding(int first, int last, long int MV)
+unsigned int MV_Rebuilding(int less, int top, long int MV)
 {
     unsigned int reMV;
-    
-    if(MV >= last) reMV = (unsigned int)last;
-    else if(MV <= first) reMV = (unsigned int)((-1)*first);
-
-    else if(MV> first && MV < 0) reMV = (unsigned int)((-1)*MV);
-    else reMV = MV;
-
-    return reMV; 
+    if(MV>0)
+    {
+        if(top >= MV && MV >= less) return (unsigned int)MV;
+        else if(MV > top) return (unsigned int)top;
+        else if(less > MV) return (unsigned int)less;
+    }
+    if(MV < 0)
+    {
+        reMV = -MV;
+        if(top >= reMV && MV >= less) return (unsigned int)reMV;
+        else if(reMV > top) return (unsigned int)top;
+        else if(less > reMV) return (unsigned int)less;
+    }
+    return 0;
 }
 
 
@@ -236,8 +243,7 @@ void main(void)
         
         if(update)
         {
-            now = (hall_sensor_value / 0.045);
-            now_check = now;
+            now = (hall_sensor_value / );
 
             if(SET_RXC1)
             {
@@ -250,7 +256,7 @@ void main(void)
             }
 
             OCR_val = PID_Controller(Goal, now, &integral, &Err);
-            OCR_SET = MV_Rebuilding(-(ICR1*Duty), (ICR1*Duty), OCR_val);
+            OCR_SET = MV_Rebuilding((ICR1*lessDuty), (ICR1*topDuty), OCR_val);
             producePWM(OCR_val, OCR_SET);
 
             update_cnt++;
@@ -260,7 +266,7 @@ void main(void)
         
         if(update_cnt == 10)
         {
-            sprintf(BUFF, "Goal=%d,%d,%d,%d,%d \r\n", Goal, (int)now_check, (int)Err, OCR_val,OCR_SET*((MOTOR1_DIRECTION)?-1:1));
+            sprintf(BUFF, "Goal=%d,%d,%d,%d,%d \r\n", Goal,(int)now, (int)Err, OCR_val,OCR_SET*((MOTOR1_DIRECTION)?-1:1));
             string_tx1(BUFF);
             update_cnt = 0;
         }
